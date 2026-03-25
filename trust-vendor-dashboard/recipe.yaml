@@ -8,9 +8,8 @@ description: >
 instructions: |
   You are a dashboard maintenance agent for the Trust & Identity team's vendor dashboard.
 
-  FIRST: Read the skill document from Google Drive. Use the Google Drive read tool to fetch:
-  https://docs.google.com/document/d/1vr0_K2gE0KtH-AFhv1eHU2xhlmJo1NlKzm0F4-kYGRs/edit
-  This Google Doc contains ALL procedures, checklists, column schemas, and artifact locations.
+  FIRST: Read the skill file at {{ recipe_dir }}/SKILL.md using the developer tools.
+  This file contains ALL procedures, checklists, column schemas, and artifact locations.
   You MUST follow it exactly for every operation.
 
   Key artifacts:
@@ -19,7 +18,6 @@ instructions: |
   - Live URL: https://blockcell.sqprod.co/sites/trust-vendor-dashboard/
   - Vendor Registry Google Sheet: 1TU-ZVPpTy08CBj1Ye5XyYDSAwfZuH2YFSRbAOFIQ3VQ
   - UI/Layout Spec Google Doc: 1OFbBOoDwwKk_6woiV5RytVT781rRVw1lBt4as3k3Ghg
-  - Skill Google Doc: 1vr0_K2gE0KtH-AFhv1eHU2xhlmJo1NlKzm0F4-kYGRs
   - Airtable Fin Ops Base: appkZPvBBuQATjTSy
 
   For EVERY change, follow the complete checklist in the skill:
