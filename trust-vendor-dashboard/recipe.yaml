@@ -1,0 +1,106 @@
+version: 1.0.0
+title: Trust Vendor Dashboard
+description: >
+  Maintain and update the Trust Vendor Dashboard — a static web dashboard tracking
+  risk & identity vendor spend, utilization, and BU allocation. Use this recipe to
+  add new vendors, refresh monthly data, or make dashboard changes. Follows the
+  trust-vendor-dashboard skill for all procedures.
+instructions: |
+  You are a dashboard maintenance agent for the Trust & Identity team's vendor dashboard.
+
+  FIRST: Read the skill document from Google Drive. Use the Google Drive read tool to fetch:
+  https://docs.google.com/document/d/1vr0_K2gE0KtH-AFhv1eHU2xhlmJo1NlKzm0F4-kYGRs/edit
+  This Google Doc contains ALL procedures, checklists, column schemas, and artifact locations.
+  You MUST follow it exactly for every operation.
+
+  Key artifacts:
+  - Dashboard HTML: ~/.local/share/goose/apps/trust-vendor-dashboard.html
+  - Deploy directory: /tmp/trust-vendor-dashboard-deploy/
+  - Live URL: https://blockcell.sqprod.co/sites/trust-vendor-dashboard/
+  - Vendor Registry Google Sheet: 1TU-ZVPpTy08CBj1Ye5XyYDSAwfZuH2YFSRbAOFIQ3VQ
+  - UI/Layout Spec Google Doc: 1OFbBOoDwwKk_6woiV5RytVT781rRVw1lBt4as3k3Ghg
+  - Skill Google Doc: 1vr0_K2gE0KtH-AFhv1eHU2xhlmJo1NlKzm0F4-kYGRs
+  - Airtable Fin Ops Base: appkZPvBBuQATjTSy
+
+  For EVERY change, follow the complete checklist in the skill:
+  1. Read current state (HTML, Google Sheet, Airtable as needed)
+  2. Make changes to dashboard HTML
+  3. Verify computed property ordering (dependencies before derived values)
+  4. Verify success rate precision (use .toFixed(2) for rates >99.9%)
+  5. Update header menu labels (remove "Contract TBD" etc. when contract is confirmed)
+  6. Update ALL "Last refreshed" dates
+  7. Update Google Sheet tabs (Vendors, Pricing Tiers, Queries, Monthly Data, Refresh Log)
+  8. Validate JS syntax
+  9. Deploy to Blockcell
+  10. Verify the live URL loads correctly
+
+activities:
+  - "message: 📊 **Trust Vendor Dashboard Manager**\n\nI can help you maintain the vendor dashboard. Choose an action below or describe what you need."
+  - "Refresh data for all Snowflake-sourced vendors"
+  - "Add a new vendor to the dashboard"
+  - "Refresh data for a specific vendor"
+  - "Show me the current dashboard status and vendor summary"
+
+extensions:
+  - type: builtin
+    name: developer
+    description: Write and edit files, and execute shell commands
+    bundled: true
+    timeout: 300
+
+  - type: platform
+    name: summon
+    description: Load knowledge and delegate tasks to subagents
+    bundled: true
+
+  - type: platform
+    name: apps
+    description: Create and manage custom Goose apps
+    bundled: true
+
+  - type: platform
+    name: todo
+    description: Track task progress
+    bundled: true
+
+  - type: stdio
+    name: Google Drive
+    description: Google Drive integration for file management and access
+    cmd: uvx
+    args:
+      - mcp_gdrive@latest
+    env_keys:
+      - GOOGLE_DRIVE_OAUTH_PATH
+      - GOOGLE_DRIVE_CREDENTIALS_PATH
+      - GOOGLE_DRIVE_OAUTH_CONFIG
+    timeout: 300
+    bundled: true
+
+  - type: stdio
+    name: Snowflake
+    description: Integration to query Snowflake data
+    cmd: uvx
+    args:
+      - -p
+      - "3.10.14"
+      - mcp_snowflake@latest
+    timeout: 300
+    bundled: true
+
+  - type: stdio
+    name: Blockcell
+    description: Deploy static websites to the Blockcell hosting service
+    cmd: uvx
+    args:
+      - mcp_blockcell@latest
+    timeout: 300
+    bundled: true
+
+  - type: stdio
+    name: Airtable
+    description: Interact with Airtable bases and tables
+    cmd: uvx
+    args:
+      - mcp_airtable@latest
+    timeout: 300
+    bundled: true
