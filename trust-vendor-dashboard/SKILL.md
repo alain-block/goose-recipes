@@ -260,7 +260,8 @@ This ensures any colleague can run the recipe from any machine — no local file
 | 7 | Smarty | smarty | Prepaid $301K/yr (1B US + 500M Intl lookups) | 60% CashApp, 40% Square | Snowflake: EVENTSTREAM2.CATALOGS.ADDRESS_VENDOR_REQUEST |
 | 8 | Socure | socure | Usage-based $0.10/call, $3.8M annual min | 100% CashApp | Snowflake: APP_CASH.HEALTH.IDV_VENDOR_EVALUATION_VERIFICATIONS |
 | 9 | NetCraft | netcraft | Flat $375,227/yr | Equal 33.3% split | Invoice (not in Snowflake) |
-| 10 | TransUnion (Neustar) | transunion | Risk: 720K/yr @ $0.135 (min $97.2K) + MPIC: 2.5M/yr @ $0.104 (min $260K) | 100% CashApp | GDrive Excel (vendor-provided) |
+| 10 | TransUnion — Risk & Fraud | tu-risk | 720K/yr @ $0.135, min $97.2K/yr | 100% Square | GDrive Excel (vendor-provided) |
+| 11 | TransUnion — MPIC | tu-mpic | 2.5M/yr @ $0.104, min $260K/yr | 100% Square | GDrive Excel (vendor-provided) |
 
 ## Google Drive CSV Data Sources
 
@@ -313,5 +314,11 @@ goose run --recipe https://github.com/alain-block/goose-recipes/tree/main/trust-
 - **Projections are always "End of Term" (EOT)**: `projectedEndOfTerm = totalCallsSum + avgMonthlyCalls * remainingMonths`. Utilization % = `totalCallsSum / committedAnnual * 100` where `committedAnnual` = commitment for the active 12-month term.
 - **NEVER hardcode** months remaining, contract periods, or "X of Y" strings in detail pages. Always use the data object properties (`remainingMonths`, `totalMonths`, `elapsedMonths`) so they stay correct when data is refreshed.
 - **Projected End-of-Term (EOT) Spend is a REQUIRED metric** for every vendor detail page. Always show what the vendor will cost by contract end at the current pace. For usage-based vendors paying minimums, this is the annual minimum. For usage-based vendors above minimums, extrapolate from the monthly average. For flat-fee vendors, this is the annual fee. Include this in the metrics grid for all vendors.
-- **Vendors with multiple service lines** (e.g., TransUnion has Risk & Fraud + MPIC) should be tracked **separately** in the detail view. Each service line gets its own metrics panel, utilization gauge (with pace indicator vs commitment), and volume chart. A combined overview section follows. The monthly detail table shows both service lines side-by-side with per-row pace indicators (% of monthly commitment pace). Pace indicators use color badges: 🟢 ≥80% = on pace, 🟡 50-80% = under-pacing, 🔴 <50% = significantly under.
-- **Bar charts MUST show only active-term months.** When a vendor has multiple service lines with different contract terms (e.g., TransUnion Risk starts Dec 2025, MPIC starts Oct 2025), each service line's chart shows only the months within its active contract term. Historical/prior-term data can appear in the combined stacked chart and in the detail table (marked as "prev term"), but the per-service-line charts and utilization gauges must be scoped to the active term. This prevents misleading utilization percentages (e.g., showing 92% elapsed when only 25% of the active term has passed). Store `activeStartIdx` in the data object to slice arrays correctly. Elapsed months, remaining months, and utilization % must all be computed from the active term window, not the full data window.
+- **Vendors with multiple products/service lines** (e.g., TransUnion has Risk & Fraud + MPIC) should be **split into separate dashboard entries** — one per product. Each product has its own contract term, commitment, pricing, and utilization story, so treating them as independent vendors keeps the code simple and consistent (no special-case multi-service logic). To maintain the vendor relationship:
+  - Name them with a shared prefix: "TransUnion — Risk & Fraud" and "TransUnion — MPIC"
+  - Place them adjacent in the menu and summary table
+  - Add a "See Also" link on each detail page pointing to the sibling entry
+  - Use the same Slack channel and MSA date on both
+  - Each entry follows the exact same standard vendor pattern as every other vendor
+- **Bar charts MUST show only active-term months.** Each vendor's chart shows only the months within its active contract term. The data object should contain only active-term data (not the full historical window). Elapsed months, remaining months, and utilization % must all be computed from the active term, not the full data window. This prevents misleading utilization percentages.
+- **Pace gauge** (`renderPaceGauge` helper): Shows a progress bar of queries used vs committed, with a vertical marker for expected pace based on time elapsed. Color-coded status: 🟢 ≥80% of expected pace, 🟡 50-80%, 🔴 <50%. Use for any vendor with a volume commitment and minimum fee.
