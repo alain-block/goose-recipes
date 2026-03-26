@@ -256,24 +256,24 @@ description: Maintain and update the Trust Vendor Dashboard — a static web das
 
 ## Sharing & Collaboration
 
-The SKILL.md (this guide) is stored as a Google Doc so that all collaborators can access and edit it.
+The recipe and SKILL.md live in a public GitHub repo. The recipe reads `SKILL.md` from the same directory using `{{ recipe_dir }}/SKILL.md`.
 
 | Artifact | Location |
 |---|---|
-| **Skill (Google Doc)** | [Trust Vendor Dashboard — SKILL.md](https://docs.google.com/document/d/1vr0_K2gE0KtH-AFhv1eHU2xhlmJo1NlKzm0F4-kYGRs/edit) |
-| **Recipe YAML** | `~/.config/goose/recipes/trust-vendor-dashboard.yaml` (shared as a file) |
-| **Local SKILL.md** | `~/.config/goose/skills/trust-vendor-dashboard/SKILL.md` (backup copy) |
+| **GitHub Repo** | [alain-block/goose-recipes](https://github.com/alain-block/goose-recipes) |
+| **Recipe** | `trust-vendor-dashboard/recipe.yaml` |
+| **Skill** | `trust-vendor-dashboard/SKILL.md` (this file) |
+| **Local copy** | `~/.config/goose/skills/trust-vendor-dashboard/SKILL.md` |
 
 ### How colleagues run this recipe
-1. Get the recipe YAML file from the dashboard owner (one-time setup via Slack/email)
-2. Place it at `~/.config/goose/recipes/trust-vendor-dashboard.yaml`
-3. Run: `goose run --recipe trust-vendor-dashboard`
-4. The recipe reads the skill from the Google Doc automatically — no other files needed
+```bash
+goose run --recipe https://github.com/alain-block/goose-recipes/tree/main/trust-vendor-dashboard
+```
 
-### Keeping the skill in sync
-- **Edit the Google Doc directly** — changes are immediately available to all collaborators
-- No need to sync files or push to a repo
-- The local SKILL.md at `~/.config/goose/skills/trust-vendor-dashboard/SKILL.md` is a backup copy
+### Updating the skill
+1. Edit `SKILL.md` in the repo (clone → edit → push, or edit on GitHub directly)
+2. Also update the local copy: `~/.config/goose/skills/trust-vendor-dashboard/SKILL.md`
+3. Colleagues get the latest version automatically next time they run the recipe
 
 ## Important Notes
 - MTD months: last month in each vendor's data array is typically MTD. Mark with `isMTD: true` and annotate in tables.
