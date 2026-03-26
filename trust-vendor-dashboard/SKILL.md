@@ -219,7 +219,13 @@ This ensures any colleague can run the recipe from any machine — no local file
    - Common patterns: SOF #002 may replace SOF #001; amendments modify existing orders; newer MSAs may supersede older ones
    - **Never assume there is only one agreement** — always check the full document chain
    - Record the Airtable partner record URL and document record URLs for the Vendors tab
-2. Search Snowflake (NATURALIZER, APP_CASH, APP_RISK, EVENTSTREAM2) for data sources
+2. **Ask the user about the data source** before searching. Present these options:
+   - **"Do you have a data source for this vendor?"**
+     - **(a) Snowflake query** — user provides the table/query. Use it directly.
+     - **(b) File** (CSV, Google Sheet, etc.) — user provides the file location. Follow the GDrive CSV refresh process.
+     - **(c) No data source / invoice-based** — skip Snowflake search entirely. Add as a flat-fee vendor (like Forter, Fortra, NetCraft) with no usage charts.
+     - **(d) Not sure — search Snowflake** — search NATURALIZER, APP_CASH, APP_RISK, EVENTSTREAM2 for tables matching the vendor name. Report findings to the user and let them decide.
+   - This avoids unnecessary Snowflake searches for vendors the user already knows are invoice-based, and avoids assuming a data source exists when it doesn't.
 3. Determine billing methodology (usage-based vs flat fee vs prepaid)
 4. Add to Google Sheet — **follow column schemas strictly**:
    - **Vendors tab**: Read header row + one existing row first. Build values A-T by column letter. Write. Read back and verify E/F/G/K/N.
