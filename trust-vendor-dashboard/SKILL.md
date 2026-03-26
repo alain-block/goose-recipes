@@ -9,12 +9,33 @@ description: Maintain and update the Trust Vendor Dashboard — a static web das
 
 | Artifact | Location |
 |---|---|
-| **Dashboard HTML** | `~/.local/share/goose/apps/trust-vendor-dashboard.html` |
-| **Deploy directory** | `/tmp/trust-vendor-dashboard-deploy/` |
 | **Live URL** | https://blockcell.sqprod.co/sites/trust-vendor-dashboard/ |
+| **Blockcell site name** | `trust-vendor-dashboard` |
+| **Dashboard HTML (working copy)** | `/tmp/trust-vendor-dashboard-deploy/index.html` |
 | **Vendor Registry** | [Google Sheet](https://docs.google.com/spreadsheets/d/1TU-ZVPpTy08CBj1Ye5XyYDSAwfZuH2YFSRbAOFIQ3VQ/edit) |
 | **UI/Layout Spec** | [Google Doc](https://docs.google.com/document/d/1OFbBOoDwwKk_6woiV5RytVT781rRVw1lBt4as3k3Ghg/edit) |
 | **Airtable Fin Ops** | Base `appkZPvBBuQATjTSy` — Partners (`tblYah9316AMvESqf`), Documents (`tblWtAPWUsnZ7wleg`) |
+
+## ⚠️ CRITICAL: Always Start by Downloading the Live Dashboard
+
+The dashboard HTML is NOT stored in this repo or in Google Drive. The **live Blockcell site is the source of truth**.
+
+Before making ANY changes, you MUST download the current dashboard:
+
+```
+1. Use Blockcell download_site action:
+   - site_name: trust-vendor-dashboard
+   - directory_path: /tmp/trust-vendor-dashboard-deploy
+   - This downloads index.html to /tmp/trust-vendor-dashboard-deploy/index.html
+
+2. All edits are made to: /tmp/trust-vendor-dashboard-deploy/index.html
+
+3. After edits, deploy back to Blockcell:
+   - site_name: trust-vendor-dashboard
+   - directory_path: /tmp/trust-vendor-dashboard-deploy
+```
+
+This ensures any colleague can run the recipe from any machine — no local files required.
 
 ## Google Sheet Tabs
 
@@ -117,7 +138,8 @@ description: Maintain and update the Trust Vendor Dashboard — a static web das
 **You MUST complete ALL of these steps for ANY dashboard modification.** Do not skip any step.
 
 ### Before Making Changes
-- [ ] Read the current dashboard HTML to understand existing structure
+- [ ] **Download the current dashboard from Blockcell**: Use `download_site` with `site_name=trust-vendor-dashboard` and `directory_path=/tmp/trust-vendor-dashboard-deploy`. This creates `/tmp/trust-vendor-dashboard-deploy/index.html` — all edits go here.
+- [ ] Read the downloaded HTML to understand existing structure
 - [ ] Read the relevant Google Sheet tabs for context
 - [ ] If adding a vendor, check Airtable Fin Ops for partner record and contract docs
 
@@ -143,7 +165,7 @@ description: Maintain and update the Trust Vendor Dashboard — a static web das
 - [ ] Update `queryMeta` object if refresh dates changed
 - [ ] Update header menu (`#menu-dropdown`) — add/remove vendor links in the "Vendor Pages" section. Remove or update any `menu-item-sub` status labels (e.g., "Contract TBD", "Trial") once a real contract is in place — active vendors with contracts should have NO sub-label, matching the pattern of other active vendors
 - [ ] Validate JS syntax: `node -c` on extracted script
-- [ ] Deploy to Blockcell: copy to `/tmp/trust-vendor-dashboard-deploy/index.html`, upload
+- [ ] Deploy to Blockcell: upload `/tmp/trust-vendor-dashboard-deploy/` with `site_name=trust-vendor-dashboard`
 
 ### Google Sheet Updates (ALL tabs as applicable)
 - [ ] **Vendors tab**: Add/update vendor row following the **Vendors Tab Column Schema** above. MUST read header + existing row first, build values by column letter A-T, verify after writing.

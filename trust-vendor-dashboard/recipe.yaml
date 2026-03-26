@@ -13,15 +13,21 @@ instructions: |
   You MUST follow it exactly for every operation.
 
   Key artifacts:
-  - Dashboard HTML: ~/.local/share/goose/apps/trust-vendor-dashboard.html
-  - Deploy directory: /tmp/trust-vendor-dashboard-deploy/
   - Live URL: https://blockcell.sqprod.co/sites/trust-vendor-dashboard/
+  - Blockcell site name: trust-vendor-dashboard
+  - Working copy: /tmp/trust-vendor-dashboard-deploy/index.html
   - Vendor Registry Google Sheet: 1TU-ZVPpTy08CBj1Ye5XyYDSAwfZuH2YFSRbAOFIQ3VQ
   - UI/Layout Spec Google Doc: 1OFbBOoDwwKk_6woiV5RytVT781rRVw1lBt4as3k3Ghg
   - Airtable Fin Ops Base: appkZPvBBuQATjTSy
 
+  IMPORTANT: The dashboard HTML is NOT stored locally. The live Blockcell site is the source of truth.
+  Before making ANY changes, ALWAYS download the current site first:
+  - Use Blockcell download_site: site_name=trust-vendor-dashboard, directory_path=/tmp/trust-vendor-dashboard-deploy
+  - Edit /tmp/trust-vendor-dashboard-deploy/index.html
+  - Deploy back to Blockcell when done
+
   For EVERY change, follow the complete checklist in the skill:
-  1. Read current state (HTML, Google Sheet, Airtable as needed)
+  1. Download current dashboard from Blockcell
   2. Make changes to dashboard HTML
   3. Verify computed property ordering (dependencies before derived values)
   4. Verify success rate precision (use .toFixed(2) for rates >99.9%)
