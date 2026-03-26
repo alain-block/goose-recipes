@@ -163,7 +163,7 @@ This ensures any colleague can run the recipe from any machine — no local file
 - [ ] Update vendor count on landing page if adding/removing vendors
 - [ ] Update `grandTotalSpend` and `grandTotalCalls` if spend/volume data changed
 - [ ] Update `queryMeta` object if refresh dates changed
-- [ ] Update header menu (`#menu-dropdown`) — add/remove vendor links in the "Vendor Pages" section. Remove or update any `menu-item-sub` status labels (e.g., "Contract TBD", "Trial") once a real contract is in place — active vendors with contracts should have NO sub-label, matching the pattern of other active vendors
+- [ ] Update header menu (`#menu-dropdown`) — add/remove vendor links in the "Vendor Pages" section. Remove or update any `menu-item-sub` status labels (e.g., "Contract TBD", "Trial") once a real contract is in place — active vendors with contracts should have NO sub-label, matching the pattern of other active vendors. Preserve the "Documentation" section links (Google Sheet, Airtable, UI Spec, Goose Skill File → GitHub repo).
 - [ ] Validate JS syntax: `node -c` on extracted script
 - [ ] Deploy to Blockcell: upload `/tmp/trust-vendor-dashboard-deploy/` with `site_name=trust-vendor-dashboard`
 
@@ -234,7 +234,7 @@ This ensures any colleague can run the recipe from any machine — no local file
    - Landing page table row in `renderLanding()`
    - Detail render function (`renderXXXDetail()`)
    - Update vendor count on landing page
-   - Update header menu (`#menu-dropdown`) — add vendor link in "Vendor Pages" section. Use a `menu-item-sub` label only for non-standard statuses (e.g., "Trial" for free trials, "Contract TBD" if contract is pending). Active vendors with confirmed contracts should have NO sub-label.
+   - Update header menu (`#menu-dropdown`) — add vendor link in "Vendor Pages" section. Use a `menu-item-sub` label only for non-standard statuses (e.g., "Trial" for free trials, "Contract TBD" if contract is pending). Active vendors with confirmed contracts should have NO sub-label. Do NOT modify the "Documentation" section links (Google Sheet, Airtable, UI Spec, Goose Skill File → `https://github.com/alain-block/goose-recipes/blob/main/trust-vendor-dashboard/SKILL.md`).
    - Update ALL "Last refreshed" dates
 6. Validate JS, deploy to Blockcell
 7. Update Monthly Data tab (if usage data exists)
@@ -301,7 +301,7 @@ goose run --recipe https://github.com/alain-block/goose-recipes/tree/main/trust-
 - MTD months: last month in each vendor's data array is typically MTD. Mark with `isMTD: true` and annotate in tables.
 - Spend is NOT calculated for MTD months — tables show "—" and totals are labeled "Total (excl. MTD)".
 - Flat-fee vendors (Forter, Fortra) have simpler detail pages — no charts, just metrics + contract info + spend table.
-- The header menu (gear icon) contains links to the Google Sheet, Airtable, and spec doc. It must survive routing changes (routing updates `#header-left`, not `#header-content`).
+- The header menu (gear icon) contains links to the Google Sheet, Airtable, spec doc, and the Goose Skill File on GitHub (`https://github.com/alain-block/goose-recipes/blob/main/trust-vendor-dashboard/SKILL.md`). These links must survive routing changes (routing updates `#header-left`, not `#header-content`). If the GitHub repo URL ever changes, update the Goose Skill File link in the menu's "Documentation" section.
 - **Always focus on the ACTIVE TERM** for utilization, spend, and projections. For multi-year contracts (e.g., NeuroID has two 12-month terms), `contractStart`/`contractEnd` and `totalMonths` refer to the **current active term**, not the full contract. Prior-term data may be shown in charts/tables for context but is excluded from totals. Use `activeTermStartIdx` to slice data arrays to the active term.
 - **Projections are always "End of Term" (EOT)**: `projectedEndOfTerm = totalCallsSum + avgMonthlyCalls * remainingMonths`. Utilization % = `totalCallsSum / committedAnnual * 100` where `committedAnnual` = commitment for the active 12-month term.
 - **NEVER hardcode** months remaining, contract periods, or "X of Y" strings in detail pages. Always use the data object properties (`remainingMonths`, `totalMonths`, `elapsedMonths`) so they stay correct when data is refreshed.
