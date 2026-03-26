@@ -298,6 +298,7 @@ goose run --recipe https://github.com/alain-block/goose-recipes/tree/main/trust-
 3. Colleagues get the latest version automatically next time they run the recipe
 
 ## Important Notes
+- **Refresh buttons**: Snowflake-sourced vendors (MaxMind, IDOLOGY, SentiLink, Smarty, Socure) have a 🔄 Refresh button in their utilization cell on the landing page. Clicking it copies a `goose run --recipe ... --text "Refresh data for <vendor>"` command to the clipboard. The `refreshBtn()` helper function generates these buttons — it uses the `recipeUrl` variable which points to `https://github.com/alain-block/goose-recipes/tree/main/trust-vendor-dashboard`. When adding a new Snowflake-sourced vendor, include `refreshBtn('VendorName')` in the utilization cell. Invoice-based and CSV-sourced vendors do NOT get refresh buttons.
 - MTD months: last month in each vendor's data array is typically MTD. Mark with `isMTD: true` and annotate in tables.
 - Spend is NOT calculated for MTD months — tables show "—" and totals are labeled "Total (excl. MTD)".
 - Flat-fee vendors (Forter, Fortra) have simpler detail pages — no charts, just metrics + contract info + spend table.
