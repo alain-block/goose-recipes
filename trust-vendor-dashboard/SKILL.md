@@ -260,6 +260,7 @@ This ensures any colleague can run the recipe from any machine — no local file
 | 7 | Smarty | smarty | Prepaid $301K/yr (1B US + 500M Intl lookups) | 60% CashApp, 40% Square | Snowflake: EVENTSTREAM2.CATALOGS.ADDRESS_VENDOR_REQUEST |
 | 8 | Socure | socure | Usage-based $0.10/call, $3.8M annual min | 100% CashApp | Snowflake: APP_CASH.HEALTH.IDV_VENDOR_EVALUATION_VERIFICATIONS |
 | 9 | NetCraft | netcraft | Flat $375,227/yr | Equal 33.3% split | Invoice (not in Snowflake) |
+| 10 | TransUnion (Neustar) | transunion | Risk: 720K/yr @ $0.135 (min $97.2K) + MPIC: 2.5M/yr @ $0.104 (min $260K) | 100% CashApp | GDrive Excel (vendor-provided) |
 
 ## Google Drive CSV Data Sources
 
