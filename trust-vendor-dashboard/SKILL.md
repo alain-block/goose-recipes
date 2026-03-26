@@ -231,6 +231,7 @@ description: Maintain and update the Trust Vendor Dashboard — a static web das
 | 6 | SentiLink | sentilink | Free trial ($0) | 100% CashApp | Snowflake: NATURALIZER.public.linkages |
 | 7 | Smarty | smarty | Prepaid $301K/yr (1B US + 500M Intl lookups) | 60% CashApp, 40% Square | Snowflake: EVENTSTREAM2.CATALOGS.ADDRESS_VENDOR_REQUEST |
 | 8 | Socure | socure | Usage-based $0.10/call, $3.8M annual min | 100% CashApp | Snowflake: APP_CASH.HEALTH.IDV_VENDOR_EVALUATION_VERIFICATIONS |
+| 9 | NetCraft | netcraft | Flat $375,227/yr | Equal 33.3% split | Invoice (not in Snowflake) |
 
 ## Google Drive CSV Data Sources
 
@@ -255,22 +256,24 @@ description: Maintain and update the Trust Vendor Dashboard — a static web das
 
 ## Sharing & Collaboration
 
-The recipe and SKILL.md live in a public GitHub repo. The recipe reads `SKILL.md` from the same directory using `{{ recipe_dir }}/SKILL.md`.
+The SKILL.md (this guide) is stored as a Google Doc so that all collaborators can access and edit it.
 
 | Artifact | Location |
 |---|---|
-| **GitHub Repo** | [alain-block/goose-recipes](https://github.com/alain-block/goose-recipes) |
-| **Recipe** | `trust-vendor-dashboard/recipe.yaml` |
-| **Skill** | `trust-vendor-dashboard/SKILL.md` (this file) |
+| **Skill (Google Doc)** | [Trust Vendor Dashboard — SKILL.md](https://docs.google.com/document/d/1vr0_K2gE0KtH-AFhv1eHU2xhlmJo1NlKzm0F4-kYGRs/edit) |
+| **Recipe YAML** | `~/.config/goose/recipes/trust-vendor-dashboard.yaml` (shared as a file) |
+| **Local SKILL.md** | `~/.config/goose/skills/trust-vendor-dashboard/SKILL.md` (backup copy) |
 
 ### How colleagues run this recipe
-```bash
-goose run --recipe https://github.com/alain-block/goose-recipes/tree/main/trust-vendor-dashboard
-```
+1. Get the recipe YAML file from the dashboard owner (one-time setup via Slack/email)
+2. Place it at `~/.config/goose/recipes/trust-vendor-dashboard.yaml`
+3. Run: `goose run --recipe trust-vendor-dashboard`
+4. The recipe reads the skill from the Google Doc automatically — no other files needed
 
-### Updating the skill
-1. Edit `SKILL.md` in the repo (directly on GitHub or clone → edit → push)
-2. Colleagues get the latest version automatically next time they run the recipe
+### Keeping the skill in sync
+- **Edit the Google Doc directly** — changes are immediately available to all collaborators
+- No need to sync files or push to a repo
+- The local SKILL.md at `~/.config/goose/skills/trust-vendor-dashboard/SKILL.md` is a backup copy
 
 ## Important Notes
 - MTD months: last month in each vendor's data array is typically MTD. Mark with `isMTD: true` and annotate in tables.
