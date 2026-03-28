@@ -262,6 +262,7 @@ This ensures any colleague can run the recipe from any machine — no local file
 | 9 | NetCraft | netcraft | Flat $375,227/yr | Equal 33.3% split | Invoice (not in Snowflake) |
 | 10 | TransUnion — Risk & Fraud | tu-risk | 720K/yr @ $0.135, min $97.2K/yr | 100% Square | GDrive Excel (vendor-provided) |
 | 11 | TransUnion — MPIC | tu-mpic | 2.5M/yr @ $0.104, min $260K/yr | 100% Square | GDrive Excel (vendor-provided) |
+| 12 | TransUnion — TLOxp | tu-tloxp | Verify Plus tiered $0.180→$0.075, $25K/mo min | 80% CashApp, 20% Square | GDrive billing statement (vendor-provided) |
 
 ## Google Drive CSV Data Sources
 
@@ -314,11 +315,12 @@ goose run --recipe https://github.com/alain-block/goose-recipes/tree/main/trust-
 - **Projections are always "End of Term" (EOT)**: `projectedEndOfTerm = totalCallsSum + avgMonthlyCalls * remainingMonths`. Utilization % = `totalCallsSum / committedAnnual * 100` where `committedAnnual` = commitment for the active 12-month term.
 - **NEVER hardcode** months remaining, contract periods, or "X of Y" strings in detail pages. Always use the data object properties (`remainingMonths`, `totalMonths`, `elapsedMonths`) so they stay correct when data is refreshed.
 - **Projected End-of-Term (EOT) Spend is a REQUIRED metric** for every vendor detail page. Always show what the vendor will cost by contract end at the current pace. For usage-based vendors paying minimums, this is the annual minimum. For usage-based vendors above minimums, extrapolate from the monthly average. For flat-fee vendors, this is the annual fee. Include this in the metrics grid for all vendors.
-- **Vendors with multiple products/service lines** (e.g., TransUnion has Risk & Fraud + MPIC) should be **split into separate dashboard entries** — one per product. Each product has its own contract term, commitment, pricing, and utilization story, so treating them as independent vendors keeps the code simple and consistent (no special-case multi-service logic). To maintain the vendor relationship:
-  - Name them with a shared prefix: "TransUnion — Risk & Fraud" and "TransUnion — MPIC"
+- **Vendors with multiple products/service lines** (e.g., TransUnion has Risk & Fraud, MPIC, and TLOxp) should be **split into separate dashboard entries** — one per product. Each product has its own contract term, commitment, pricing, and utilization story, so treating them as independent vendors keeps the code simple and consistent (no special-case multi-service logic). To maintain the vendor relationship:
+  - Name them with a shared prefix: "TransUnion — Risk & Fraud", "TransUnion — MPIC", "TransUnion — TLOxp"
   - Place them adjacent in the menu and summary table
-  - Add a "See Also" link on each detail page pointing to the sibling entry
-  - Use the same Slack channel and MSA date on both
+  - Add "See Also" links on each detail page pointing to sibling entries
+  - Use the same Slack channel and MSA date on all
   - Each entry follows the exact same standard vendor pattern as every other vendor
+- **Spend-only vendors** (no query counts available): Some vendors only provide billing statements with dollar amounts, not transaction counts. For these, track monthly spend per account, show a spend bar chart instead of a volume chart, and skip utilization/pace gauges. The detail table shows account-level breakdown and BU attribution. Example: TransUnion — TLOxp.
 - **Bar charts MUST show only active-term months.** Each vendor's chart shows only the months within its active contract term. The data object should contain only active-term data (not the full historical window). Elapsed months, remaining months, and utilization % must all be computed from the active term, not the full data window. This prevents misleading utilization percentages.
 - **Pace gauge** (`renderPaceGauge` helper): Shows a progress bar of queries used vs committed, with a vertical marker for expected pace based on time elapsed. Color-coded status: 🟢 ≥80% of expected pace, 🟡 50-80%, 🔴 <50%. Use for any vendor with a volume commitment and minimum fee.
