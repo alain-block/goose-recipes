@@ -262,7 +262,7 @@ This ensures any colleague can run the recipe from any machine — no local file
 | 9 | NetCraft | netcraft | Flat $375,227/yr | Equal 33.3% split | Invoice (not in Snowflake) |
 | 10 | TransUnion — Risk & Fraud | tu-risk | 720K/yr @ $0.135, min $97.2K/yr | 100% Square | GDrive Excel (vendor-provided) |
 | 11 | TransUnion — MPIC | tu-mpic | 2.5M/yr @ $0.104, min $260K/yr | 100% Square | GDrive Excel (vendor-provided) |
-| 12 | TransUnion — TLOxp | tu-tloxp | Verify Plus tiered $0.180→$0.075, $25K/mo min | 80% CashApp, 20% Square | GDrive billing statement (vendor-provided) |
+| 12 | TransUnion — TLOxp | tu-tloxp | TLOxp Online tiered $1.25→$0.88/txn, $12.5K/mo min | 80% CashApp, 20% Square | GDrive billing statement (vendor-provided) |
 
 ## Google Drive CSV Data Sources
 
