@@ -68,7 +68,7 @@ extensions:
     bundled: true
 
   - type: stdio
-    name: Google Drive
+    name: googledrive
     description: Google Drive integration for file management and access
     cmd: uvx
     args:
@@ -81,7 +81,7 @@ extensions:
     bundled: true
 
   - type: stdio
-    name: Snowflake
+    name: snowflake
     description: Integration to query Snowflake data
     cmd: uvx
     args:
@@ -92,7 +92,7 @@ extensions:
     bundled: true
 
   - type: stdio
-    name: Blockcell
+    name: blockcell
     description: Deploy static websites to the Blockcell hosting service
     cmd: uvx
     args:
@@ -101,7 +101,7 @@ extensions:
     bundled: true
 
   - type: stdio
-    name: Airtable
+    name: airtable
     description: Interact with Airtable bases and tables
     cmd: uvx
     args:
