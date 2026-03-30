@@ -159,10 +159,10 @@ This ensures any colleague can run the recipe from any machine — no local file
   - For multi-year contracts: use `activeTermStartIdx` to separate prior-term data; prior-term rows shown dimmed in tables but excluded from totals
   - All contract info cards use dynamic values (e.g., `remainingMonths + ' of ' + totalMonths`), NOT hardcoded strings
   - Contract Period text matches `contractStart` / `contractEnd` in the data object
-- [ ] Update "Last refreshed" date on ALL pages (search for ALL instances of `last-refreshed`)
+- [ ] Update `lastRefreshed` property in the vendor's data object (the HTML spans are populated dynamically by `populateRefreshDates()`)
 - [ ] Update vendor count on landing page if adding/removing vendors
 - [ ] Update `grandTotalSpend` and `grandTotalCalls` if spend/volume data changed
-- [ ] Update `queryMeta` object if refresh dates changed
+- [ ] Update `queryMeta` object if query metadata changed
 - [ ] Update header menu (`#menu-dropdown`) — add/remove vendor links in the "Vendor Pages" section. Remove or update any `menu-item-sub` status labels (e.g., "Contract TBD", "Trial") once a real contract is in place — active vendors with contracts should have NO sub-label, matching the pattern of other active vendors. Preserve the "Documentation" section links (Google Sheet, Airtable, UI Spec, Goose Skill File → GitHub repo).
 - [ ] Validate JS syntax: `node -c` on extracted script
 - [ ] Deploy to Blockcell: upload `/tmp/trust-vendor-dashboard-deploy/` with `site_name=trust-vendor-dashboard`
@@ -179,7 +179,7 @@ This ensures any colleague can run the recipe from any machine — no local file
 
 ### Final Verification
 - [ ] Dashboard loads correctly at the live URL
-- [ ] All "Last refreshed" dates are consistent and correct
+- [ ] All vendor data objects have correct `lastRefreshed` dates (populated dynamically by `populateRefreshDates()`)
 - [ ] Google Sheet data matches what's displayed in the dashboard
 - [ ] Refresh Log has an entry for this change
 
@@ -191,7 +191,7 @@ This ensures any colleague can run the recipe from any machine — no local file
 3. Execute in Snowflake
 4. Update the **Monthly Data** tab with new results
 5. Update the dashboard HTML data arrays
-6. Update ALL "Last refreshed" dates in the HTML
+6. Update `lastRefreshed` property in the vendor's data object (e.g., `lastRefreshed: 'March 30, 2026'`)
 7. Update `queryMeta` object (lastRun, mtdDate, mtdDays, mtdTotalDays)
 8. Validate JS, deploy to Blockcell
 9. Append to **Refresh Log**
@@ -204,7 +204,7 @@ This ensures any colleague can run the recipe from any machine — no local file
 5. Cover only months within the active contract term
 6. Update the **Monthly Data** tab with new results
 7. Update the dashboard HTML data arrays (months, totalCalls, completed, failed, isMTD, elapsedMonths, remainingMonths)
-8. Update ALL "Last refreshed" dates in the HTML
+8. Update `lastRefreshed` property in the vendor's data object
 9. Update `queryMeta` object (lastRun, mtdDate, mtdDays, mtdTotalDays, mtdNote)
 10. Validate JS, deploy to Blockcell
 11. Append to **Refresh Log**
@@ -241,7 +241,7 @@ This ensures any colleague can run the recipe from any machine — no local file
    - Detail render function (`renderXXXDetail()`)
    - Update vendor count on landing page
    - Update header menu (`#menu-dropdown`) — add vendor link in "Vendor Pages" section. Use a `menu-item-sub` label only for non-standard statuses (e.g., "Trial" for free trials, "Contract TBD" if contract is pending). Active vendors with confirmed contracts should have NO sub-label. Do NOT modify the "Documentation" section links (Google Sheet, Airtable, UI Spec, Goose Skill File → `https://github.com/alain-block/goose-recipes/blob/main/trust-vendor-dashboard/SKILL.md`).
-   - Update ALL "Last refreshed" dates
+   - Set `lastRefreshed` property in the vendor's data object (dates are populated dynamically by `populateRefreshDates()`)
 6. Validate JS, deploy to Blockcell
 7. Update Monthly Data tab (if usage data exists)
 8. Append to Refresh Log
@@ -377,10 +377,12 @@ Every vendor detail page MUST follow this exact HTML structure and element order
     <div class="card-title">Monthly Detail</div>
     <div class="scroll-table"><table class="detail-table" id="{prefix}-detail-table"></table></div>
   </div>
-  <!-- 7. Last refreshed -->
-  <div class="last-refreshed">Last refreshed: <span>{date}</span></div>
+  <!-- 7. Last refreshed (populated dynamically from data object) -->
+  <div class="last-refreshed">Last refreshed: <span id="refresh-{slug}"></span></div>
 </div>
 ```
+
+**Last-refreshed dates are DYNAMIC.** Each vendor data object has a `lastRefreshed` property (e.g., `lastRefreshed: 'March 30, 2026'`). The `populateRefreshDates()` function runs on page load and fills every `<span id="refresh-{slug}">` from the corresponding data object. The summary page shows the most recent date across all vendors. When refreshing a vendor's data, update ONLY the `lastRefreshed` property in that vendor's data object — do NOT edit the HTML spans directly.
 
 **Ordering rule:** Vendors are listed **alphabetically** in the menu, summary table, and detail page HTML divs. When adding a new vendor, insert it in the correct alphabetical position in all three places. Multi-product vendors (e.g., TransUnion — MPIC, TransUnion — Risk, TransUnion — TLOxp) sort by their full name including the product suffix.
 
