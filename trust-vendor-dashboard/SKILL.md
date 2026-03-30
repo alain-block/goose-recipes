@@ -324,3 +324,68 @@ goose run --recipe https://github.com/alain-block/goose-recipes/tree/main/trust-
 - **Spend-only vendors** (no query counts available): Some vendors only provide billing statements with dollar amounts, not transaction counts. For these, track monthly spend per account, show a spend bar chart instead of a volume chart, and skip utilization/pace gauges. The detail table shows account-level breakdown and BU attribution. Example: TransUnion — TLOxp.
 - **Bar charts MUST show only active-term months.** Each vendor's chart shows only the months within its active contract term. The data object should contain only active-term data (not the full historical window). Elapsed months, remaining months, and utilization % must all be computed from the active term, not the full data window. This prevents misleading utilization percentages.
 - **Pace gauge** (`renderPaceGauge` helper): Shows a progress bar of queries used vs committed, with a vertical marker for expected pace based on time elapsed. Color-coded status: 🟢 ≥80% of expected pace, 🟡 50-80%, 🔴 <50%. Use for any vendor with a volume commitment and minimum fee.
+
+### Standard Detail Page Layout (REQUIRED)
+
+Every vendor detail page MUST follow this exact HTML structure and element ordering. Do NOT deviate from this layout — it ensures visual consistency across all vendor pages.
+
+```
+1. Contract banner      — colored card with border-left accent, key terms at a glance
+2. Metrics grid         — 7 metric cards (use class "metrics-grid")
+3. Pace gauge           — full-width commitment utilization bar (if vendor has volume commitment)
+4. two-col row          — Contract Information (left) | Business Unit Attribution (right)
+5. Volume/Spend chart   — FULL-WIDTH card with chart legend + canvas (height="260")
+6. Detail table         — full-width card with scrollable table
+7. Last refreshed       — timestamp
+```
+
+**HTML template:**
+```html
+<div class="page" id="page-detail-{slug}">
+  <!-- 1. Contract banner -->
+  <div class="card" style="background:{bgColor};border-left:4px solid {accentColor};margin-bottom:16px">
+    <div class="card-title" style="color:{titleColor}">{icon} Active Contract — {renewal type}</div>
+    <div style="font-size:13px;color:{textColor};line-height:1.6">
+      <strong>MSA:</strong> ... | <strong>Term:</strong> ... | <strong>Bill To:</strong> ...<br>
+      <strong>Commitment:</strong> ... | <strong>Annual Min:</strong> ... | <strong>Pricing:</strong> ...<br>
+      <em>Renewal terms. See also links if multi-product vendor.</em>
+    </div>
+  </div>
+  <!-- 2. Metrics grid -->
+  <div class="metrics-grid" id="{prefix}-metrics-grid"></div>
+  <!-- 3. Pace gauge (if applicable) -->
+  <div id="{prefix}-gauge" style="padding:0 24px 16px"></div>
+  <!-- 4. Two-col: Contract Info + BU Attribution -->
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">Contract Information</div>
+      <div class="contract-grid" id="{prefix}-contract-info"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Business Unit Attribution</div>
+      <div class="gauge-container" id="{prefix}-bu-container"></div>
+    </div>
+  </div>
+  <!-- 5. Volume/Spend chart — ALWAYS full-width, NEVER inside two-col -->
+  <div class="card">
+    <div class="card-title">Monthly Volume/Spend</div>
+    <div class="chart-legend" id="{prefix}-volume-legend"></div>
+    <div class="chart-container"><canvas id="{prefix}-chart-volume" height="260"></canvas></div>
+  </div>
+  <!-- 6. Detail table -->
+  <div class="card">
+    <div class="card-title">Monthly Detail</div>
+    <div class="scroll-table"><table class="detail-table" id="{prefix}-detail-table"></table></div>
+  </div>
+  <!-- 7. Last refreshed -->
+  <div class="last-refreshed">Last refreshed: <span>{date}</span></div>
+</div>
+```
+
+**Common mistakes to avoid:**
+- ❌ Putting the volume chart inside a `two-col` — it gets cramped and unreadable
+- ❌ Omitting the contract banner — the page looks incomplete without the colored summary card
+- ❌ Putting BU Attribution or Pace Gauge in a second `two-col` row below the chart — they belong above it
+- ❌ Missing chart legend — always include a legend div above the canvas
+- ❌ Using `height="240"` on canvas — standard is `height="260"`
+- ❌ Forgetting to add the vendor to the resize handler in the `setTimeout` block at the end of the file
