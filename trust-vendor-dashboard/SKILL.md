@@ -382,6 +382,8 @@ Every vendor detail page MUST follow this exact HTML structure and element order
 </div>
 ```
 
+**Ordering rule:** Vendors are listed **alphabetically** in the menu, summary table, and detail page HTML divs. When adding a new vendor, insert it in the correct alphabetical position in all three places. Multi-product vendors (e.g., TransUnion — MPIC, TransUnion — Risk, TransUnion — TLOxp) sort by their full name including the product suffix.
+
 **Common mistakes to avoid:**
 - ❌ Putting the volume chart inside a `two-col` — it gets cramped and unreadable
 - ❌ Omitting the contract banner — the page looks incomplete without the colored summary card
@@ -389,3 +391,4 @@ Every vendor detail page MUST follow this exact HTML structure and element order
 - ❌ Missing chart legend — always include a legend div above the canvas
 - ❌ Using `height="240"` on canvas — standard is `height="260"`
 - ❌ Forgetting to add the vendor to the resize handler in the `setTimeout` block at the end of the file
+- ❌ Adding a new vendor at the end instead of in alphabetical order
