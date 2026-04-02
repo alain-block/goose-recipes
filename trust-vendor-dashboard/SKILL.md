@@ -135,53 +135,38 @@ This ensures any colleague can run the recipe from any machine — no local file
 
 ## Checklist: EVERY Dashboard Change
 
-**You MUST complete ALL of these steps for ANY dashboard modification.** Do not skip any step.
+### 1. Download
+- [ ] Download from Blockcell: `download_site` → `site_name=trust-vendor-dashboard`, `directory_path=/tmp/trust-vendor-dashboard-deploy`
 
-### Before Making Changes
-- [ ] **Download the current dashboard from Blockcell**: Use `download_site` with `site_name=trust-vendor-dashboard` and `directory_path=/tmp/trust-vendor-dashboard-deploy`. This creates `/tmp/trust-vendor-dashboard-deploy/index.html` — all edits go here.
-- [ ] Read the downloaded HTML to understand existing structure
-- [ ] Read the relevant Google Sheet tabs for context
-- [ ] If adding a vendor, check Airtable Fin Ops for partner record and contract docs
-
-### Dashboard HTML Changes
-- [ ] Update data objects (JS variables) with correct values
-- [ ] **Verify computed property ordering**: Any property that depends on another computed property MUST be defined AFTER its dependency. For example, `totalUsOnly` and `totalIntlOnly` must be computed before `utilPctUs`, `utilPctIntl`, or `utilPctTotal` that reference them. JavaScript does NOT hoist `var` assignments — using a property before its assignment line yields `undefined`/`NaN`.
-- [ ] **Verify success rate precision**: The global `fmtPct()` function rounds to 1 decimal place. For vendors with very high success rates (>99.9%), this rounds to "100.0%" which is misleading. Use `.toFixed(2) + '%'` instead of `fmtPct()` for success rate metric cards to ensure rates like 99.98% display correctly rather than rounding to 100.0%.
-- [ ] Verify projections and term math for every vendor touched:
-  - `contractStart`/`contractEnd` = active term dates (NOT full multi-year contract)
-  - `totalMonths` = length of active term in months (e.g., 12 for annual)
-  - `elapsedMonths` = number of full months of data in active term (excl MTD)
-  - `remainingMonths` = months left until active term end (incl current MTD month)
-  - `committedAnnual` = commitment for the active term (e.g., 180K × 12 = 2,160,000)
-  - `projectedEndOfTerm` = `totalCallsSum + avgMonthlyCalls * remainingMonths`
-  - `projectedSpend` = `totalSpend + remainingMonths * (totalSpend / elapsedMonths)`
-  - Utilization = `totalCallsSum / committedAnnual * 100` (active term only)
-  - For multi-year contracts: use `activeTermStartIdx` to separate prior-term data; prior-term rows shown dimmed in tables but excluded from totals
-  - All contract info cards use dynamic values (e.g., `remainingMonths + ' of ' + totalMonths`), NOT hardcoded strings
-  - Contract Period text matches `contractStart` / `contractEnd` in the data object
-- [ ] Update `lastRefreshed` property in the vendor's data object (the HTML spans are populated dynamically by `populateRefreshDates()`)
+### 2. Edit (`/tmp/trust-vendor-dashboard-deploy/index.html`)
+- [ ] Update data objects with correct values
+- [ ] Update `lastRefreshed` in the vendor's data object
+- [ ] Update `grandTotalSpend` / `grandTotalCalls` if spend/volume changed
 - [ ] Update vendor count on landing page if adding/removing vendors
-- [ ] Update `grandTotalSpend` and `grandTotalCalls` if spend/volume data changed
-- [ ] Update `queryMeta` object if query metadata changed
-- [ ] Update header menu (`#menu-dropdown`) — add/remove vendor links in the "Vendor Pages" section. Remove or update any `menu-item-sub` status labels (e.g., "Contract TBD", "Trial") once a real contract is in place — active vendors with contracts should have NO sub-label, matching the pattern of other active vendors. Preserve the "Documentation" section links (Google Sheet, Airtable, UI Spec, Goose Skill File → GitHub repo).
-- [ ] Validate JS syntax: `node -c` on extracted script
-- [ ] Deploy to Blockcell: upload `/tmp/trust-vendor-dashboard-deploy/` with `site_name=trust-vendor-dashboard`
+- [ ] Update menu, routing, summary table if adding/removing vendors (alphabetical order)
+- [ ] Add vendor to `populateRefreshDates()` array if new
 
-### Google Sheet Updates (ALL tabs as applicable)
-- [ ] **Vendors tab**: Add/update vendor row following the **Vendors Tab Column Schema** above. MUST read header + existing row first, build values by column letter A-T, verify after writing.
-- [ ] **Pricing Tiers tab**: Add/update pricing rows with Airtable doc reference
-- [ ] **Queries tab**: Add/update SQL templates (or note "N/A — invoice-based" for non-Snowflake vendors)
-- [ ] **Monthly Data tab**: Add/update rows following the **Monthly Data Tab Column Schema** above (one row per vendor per month)
-- [ ] **Refresh Log tab**: Append a new entry following the **Refresh Log Tab Column Schema** above
+### 3. Validate & Deploy
+- [ ] `node -c` on extracted script
+- [ ] Deploy to Blockcell
 
-### Documentation Updates
-- [ ] Update the UI/Layout Spec Google Doc if layout/structure changed
+### 4. Google Sheet (batch: read all headers first, then write all tabs, then verify)
+- [ ] **Vendors tab** — build row by column letter A-T, verify E/F/G/K/N after write
+- [ ] **Pricing Tiers** — add/update rows
+- [ ] **Queries** — SQL template or `N/A — invoice-based` or `GDrive {type}`
+- [ ] **Monthly Data** — one row per vendor per month
+- [ ] **Refresh Log** — append entry
 
-### Final Verification
-- [ ] Dashboard loads correctly at the live URL
-- [ ] All vendor data objects have correct `lastRefreshed` dates (populated dynamically by `populateRefreshDates()`)
-- [ ] Google Sheet data matches what's displayed in the dashboard
-- [ ] Refresh Log has an entry for this change
+### 5. Verify
+- [ ] Dashboard loads at live URL
+- [ ] Data matches Google Sheet
+- [ ] Refresh Log has entry
+
+### ⚠️ Common Pitfalls (check if applicable)
+- **Computed property ordering**: Dependencies must be defined BEFORE derived metrics. `totalUsOnly` before `utilPctUs`. JavaScript does NOT hoist `var` assignments.
+- **Success rate precision**: Use `.toFixed(2) + '%'` instead of `fmtPct()` for rates >99.9% to avoid rounding to "100.0%".
+- **Term math**: `contractStart`/`contractEnd` = active term only. `elapsedMonths` excludes MTD. `remainingMonths` includes current month. `committedAnnual` = active term commitment. Never hardcode "X of Y" strings — use data object properties.
+- **Menu labels**: Active vendors with contracts have NO `menu-item-sub` label. Only use for "Trial" or "Contract TBD".
 
 ## Checklist: Refreshing Vendor Data
 
@@ -211,41 +196,122 @@ This ensures any colleague can run the recipe from any machine — no local file
 
 ## Checklist: Adding a New Vendor
 
-1. Check Airtable Fin Ops for partner record and **ALL linked documents**
-   - **CRITICAL: A partner may have MULTIPLE agreements** (MSA, SOWs, amendments, order forms, etc.)
-   - Always list ALL documents linked to the partner record in the Documents table (`tblWtAPWUsnZ7wleg`)
-   - Read each document's AI-extracted fields: `Document Title (AI)`, `Document Summary (AI)`, `Key Contract Details (AI)`, `Effective Date (AI)`, `Agreement Expiration Date (AI)`, `Document Type (AI)`
-   - Determine which agreement is the **currently active one** by examining effective dates, supersession clauses, and amendment chains
-   - Common patterns: SOF #002 may replace SOF #001; amendments modify existing orders; newer MSAs may supersede older ones
-   - **Never assume there is only one agreement** — always check the full document chain
-   - Record the Airtable partner record URL and document record URLs for the Vendors tab
-2. **Ask the user about the data source** before searching. Present these options:
-   - **"Do you have a data source for this vendor?"**
-     - **(a) Snowflake query** — user provides the table/query. Use it directly.
-     - **(b) File** (CSV, Google Sheet, etc.) — user provides the file location. Follow the GDrive CSV refresh process.
-     - **(c) No data source / invoice-based** — skip Snowflake search entirely. Add as a flat-fee vendor (like Forter, Fortra, NetCraft) with no usage charts.
-     - **(d) Not sure — search Snowflake** — search NATURALIZER, APP_CASH, APP_RISK, EVENTSTREAM2 for tables matching the vendor name. Report findings to the user and let them decide.
-   - This avoids unnecessary Snowflake searches for vendors the user already knows are invoice-based, and avoids assuming a data source exists when it doesn't.
-3. Determine billing methodology (usage-based vs flat fee vs prepaid)
-4. Add to Google Sheet — **follow column schemas strictly**:
-   - **Vendors tab**: Read header row + one existing row first. Build values A-T by column letter. Write. Read back and verify E/F/G/K/N.
-   - **Pricing Tiers tab**: Add pricing rows
-   - **Queries tab**: Add SQL template or "N/A — invoice-based"
-5. Add to dashboard HTML:
-   - Data object (after existing vendor data)
-   - **Computed properties must be ordered by dependency** — define base sums (e.g., `totalUsOnly`, `totalIntlOnly`) BEFORE derived metrics (e.g., `utilPctUs`, `utilPctIntl`) that reference them
-   - Include in `grandTotalSpend` / `grandTotalCalls`
-   - HTML page structure (detail page div)
-   - Routing in `handleRoute()` function
-   - Landing page table row in `renderLanding()`
-   - Detail render function (`renderXXXDetail()`)
-   - Update vendor count on landing page
-   - Update header menu (`#menu-dropdown`) — add vendor link in "Vendor Pages" section. Use a `menu-item-sub` label only for non-standard statuses (e.g., "Trial" for free trials, "Contract TBD" if contract is pending). Active vendors with confirmed contracts should have NO sub-label. Do NOT modify the "Documentation" section links (Google Sheet, Airtable, UI Spec, Goose Skill File → `https://github.com/alain-block/goose-recipes/blob/main/trust-vendor-dashboard/SKILL.md`).
-   - Set `lastRefreshed` property in the vendor's data object (dates are populated dynamically by `populateRefreshDates()`)
-6. Validate JS, deploy to Blockcell
-7. Update Monthly Data tab (if usage data exists)
-8. Append to Refresh Log
-9. Update UI/Layout Spec Google Doc
+### Step 1 — Upfront Intake (ASK FIRST, before doing anything)
+
+Present this to the user in a single message and wait for answers before proceeding:
+
+```
+To add this vendor efficiently, please share what you know (skip anything you don't have):
+
+1. **Data source**: Snowflake table/query, file (CSV/Excel/GSheet URL), or invoice-only?
+2. **Contract info**: Start/end dates, commitment, pricing, renewal terms?
+3. **Business unit split**: CashApp / Square / Afterpay percentages?
+4. **Billing type**: Usage-based, flat fee, prepaid, or tiered?
+5. **Multi-product?**: Does this vendor have multiple products we track separately?
+6. **Anything else**: Slack channel, relationship DRI, notes?
+```
+
+**Why:** This eliminates 3-5 back-and-forth turns. The user often already knows the data source, billing type, and BU split — asking upfront avoids unnecessary Snowflake searches and Airtable deep-dives.
+
+### Step 2 — Parallel Research (run simultaneously)
+
+Run these lookups **in parallel** — they are independent read-only operations:
+
+| Track A: Airtable | Track B: Data Source |
+|---|---|
+| Search partner in `tblYah9316AMvESqf` | Based on user's answer from Step 1: |
+| List linked docs from `tblWtAPWUsnZ7wleg` | **(a) Snowflake** → run the query |
+| Triage docs (see below) | **(b) File** → download and parse |
+| | **(c) Invoice** → skip (no data to fetch) |
+| | **(d) Not sure** → search Snowflake tables |
+
+**Smart Airtable document triage** (avoid reading every field of every doc):
+1. List ALL linked documents but fetch only: `Document Title (AI)`, `Document Type (AI)`, `Effective Date (AI)`, `Agreement Expiration Date (AI)`
+2. Sort by effective date descending
+3. Deep-read ONLY the 1-2 most recent/relevant docs (active SOF, current MSA, latest amendment)
+4. Skip older superseded agreements unless the chain is ambiguous
+5. Record partner URL and active document URL(s) for the Vendors tab
+
+### Step 3 — Determine Vendor Type
+
+Based on intake answers + research, classify the vendor:
+
+| Type | Characteristics | Dashboard Pattern |
+|---|---|---|
+| **usage-snowflake** | Query counts from Snowflake | Volume chart + pace gauge + detail table |
+| **usage-gdrive** | Query counts from CSV/Excel/GSheet | Volume chart + pace gauge + detail table |
+| **spend-only** | Dollar amounts only (no txn counts) | Spend chart + detail table (no pace gauge) |
+| **invoice-flat** | Fixed fee, no usage data | Metrics + contract info only (no charts) |
+
+### Step 4 — Dashboard HTML
+
+1. Download from Blockcell → `/tmp/trust-vendor-dashboard-deploy/index.html`
+2. Add data object in **alphabetical position** among existing vendor vars (include `lastRefreshed`, `buSplit`, `slug`)
+3. Add to `grandTotalSpend` / `grandTotalCalls` (if applicable)
+4. Add detail page div: `<div class="page" id="page-detail-{slug}">` with standard containers (follow Standard Detail Page Layout below)
+5. Add `renderXXXDetail()` function — use `renderBU(containerId, v.buSplit, v.totalSpend, note)` for BU attribution (shared helper, already defined)
+6. Add routing in `handleRoute()` — call `renderXXXDetail()`
+7. Add menu entry in `#menu-dropdown` (alphabetical position)
+8. Add summary table row in `renderLanding()` (alphabetical position)
+9. Add to `populateRefreshDates()` vendors array
+10. Add to resize handler `setTimeout` block
+11. Update vendor count on landing page
+12. Validate JS: `node -c`
+13. Deploy to Blockcell
+
+### Step 5 — Google Sheet (batch writes)
+
+**Read phase** (parallel): Read header row + one template row from ALL tabs in one pass.
+**Write phase** (parallel where possible): Write all tabs, then verify.
+
+| Tab | Action |
+|---|---|
+| **Vendors** | Add row (columns A-T, build by letter, verify E/F/G/K/N after write) |
+| **Pricing Tiers** | Add pricing rows with Airtable doc reference |
+| **Queries** | Add SQL template, or `N/A — invoice-based`, or `GDrive {type}` |
+| **Monthly Data** | Add rows (one per month) if usage data exists |
+| **Refresh Log** | Append entry |
+
+### Step 6 — Finalize
+
+- [ ] Dashboard loads correctly at live URL
+- [ ] New vendor page follows Standard Detail Page Layout
+- [ ] `lastRefreshed` property set in data object
+- [ ] Google Sheet data matches dashboard
+- [ ] Push updated SKILL.md to GitHub if vendor table changed
+
+### Type-Specific Quick Reference
+
+**Usage-based (Snowflake or GDrive):**
+```
+Data object: months, totalCalls, completed, failed, isMTD, buSplit, commitment, pricing, lastRefreshed, slug
+Render function: renderXXXDetail() — metrics grid, renderBU(), renderPaceGauge(), bar chart, detail table
+Sheet: All 5 tabs
+```
+
+**Spend-only (dollar amounts, no txn counts):**
+```
+Data object: months, account arrays (spend per account), isMTD, buSplit, pricing, lastRefreshed, slug
+Render function: renderXXXDetail() — metrics grid, renderBU(), spend chart (no pace gauge), detail table
+Sheet: Vendors + Pricing + Refresh Log (no Queries, Monthly Data uses spend columns)
+```
+
+**Invoice/flat-fee (no usage data at all):**
+```
+Data object: annualFee, monthlyFee, contractStart/End, buSplit, lastRefreshed, slug
+Render function: renderXXXDetail() — metrics grid, renderBU(), contract info, spend table (no charts)
+Sheet: Vendors + Pricing + Refresh Log only
+```
+
+### Shared Helper Functions
+
+| Function | Purpose | Usage |
+|---|---|---|
+| `renderBU(containerId, buSplit, totalSpend, note)` | Renders BU attribution bar + legend | All 10 vendors with BU containers |
+| `renderPaceGauge(containerId, label, used, committed, elapsed, total, paceColor, accentColor)` | Renders utilization gauge with pace marker | Usage-based vendors with commitments |
+| `renderBarChart(canvasId, labels, data, opts)` | Renders bar chart on canvas | Volume/spend charts |
+| `renderStackedBarChart(canvasId, labels, datasets, opts)` | Renders stacked bar chart | Multi-account spend charts (e.g., TLOxp) |
+| `populateRefreshDates()` | Fills all "Last refreshed" spans from data objects | Called once at init |
 
 ## Current Vendors (as of March 2026)
 
