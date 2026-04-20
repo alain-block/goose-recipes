@@ -1,42 +1,43 @@
 # Goose Recipes
 
-Shared Goose recipes for the Trust & Identity team.
+Shared Goose recipes and skills for the Trust & Identity team — vendor management, invoice tracking, and dashboard maintenance.
 
-## Trust Vendor Dashboard
+## Vendors
 
-Maintain and update the [Trust Vendor Dashboard](https://blockcell.sqprod.co/sites/trust-vendor-dashboard/) — a static web dashboard tracking risk & identity vendor spend, utilization, and BU allocation.
+| Vendor | Description | Quick Start |
+|---|---|---|
+| [**Experian**](experian/) | Consumer credit data — agreements, billing, subscriber codes, PO tracking, entity mapping across Square Capital, SFS, and Afterpay | `goose run --recipe experian/recipe.yaml` |
+| [**ThreatMetrix**](threatmetrix/) | LexisNexis device intelligence & fraud detection — contract details, invoice reconciliation, usage tracking | `goose run --recipe threatmetrix/recipe.yaml` |
+| [**Trust Vendor Dashboard**](trust-vendor-dashboard/) | Static dashboard tracking risk & identity vendor spend, utilization, and BU allocation | `goose run --recipe trust-vendor-dashboard/recipe.yaml` |
 
-### Quick Start
+## Usage
 
+### Run a recipe directly from GitHub
 ```bash
-goose run --recipe https://github.com/alain-block/goose-recipes/tree/main/trust-vendor-dashboard
+goose run --recipe https://github.com/alain-block/goose-recipes/tree/main/<vendor>
 ```
 
-Or clone and run locally:
-
+### Clone and run locally
 ```bash
 git clone https://github.com/alain-block/goose-recipes.git
-goose run --recipe goose-recipes/trust-vendor-dashboard
+goose run --recipe goose-recipes/<vendor>/recipe.yaml
 ```
 
-### What it does
+### Install a skill for auto-discovery
+```bash
+mkdir -p ~/.agents/skills/<vendor>
+cp goose-recipes/<vendor>/SKILL.md ~/.agents/skills/<vendor>/SKILL.md
+```
 
-- Add new vendors to the dashboard
-- Refresh monthly data from Snowflake
-- Update contract details and pricing
-- Deploy changes to Blockcell
+Then Goose will automatically load the skill when your questions match its domain.
 
-### Required Extensions
+## Structure
 
-The recipe will configure these automatically:
-- **Google Drive** — read/write vendor registry, skill doc, contracts
-- **Snowflake** — query vendor usage data
-- **Blockcell** — deploy the dashboard
-- **Airtable** — read partner records and contract documents
+Each vendor folder follows the same pattern:
 
-### Skill Document
-
-The full maintenance guide (procedures, checklists, column schemas) lives in a shared Google Doc:
-[Trust Vendor Dashboard — SKILL.md](https://docs.google.com/document/d/1vr0_K2gE0KtH-AFhv1eHU2xhlmJo1NlKzm0F4-kYGRs/edit)
-
-Edit the Google Doc directly to update procedures — all collaborators get changes immediately.
+```
+<vendor>/
+├── SKILL.md        # Knowledge base — contacts, contracts, pricing, sub codes, etc.
+├── recipe.yaml     # Goose recipe that loads the skill and provides assistance
+└── README.md       # Usage instructions and topic overview
+```
